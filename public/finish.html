@@ -8,12 +8,26 @@
   <div class="completion-screen">
     <h1>결제가 완료되었습니다.</h1>
     <h2>잠시만 기다려주세요!</h2>
+    <h1 id="countNum" class="count-down">3</h1>
   </div>
   <script>
-    // 5초 후 첫 화면으로 이동
+    // 3초 후 첫 화면으로 이동
+    const content = document.getElementById('countNum');
     setTimeout(() => {
-      window.location.href = '/';
-    }, 5000);
+        content.textContent = '2'
+        setTimeout(() => {
+            content.textContent = '1'
+            setTimeout(() => {
+                content.textContent = '3'
+              window.location.href = '/';
+            }, 1000);
+        }, 1000)
+        
+    }, 1000)
+
+    
+
+    
   </script>
 </body>
 </html>

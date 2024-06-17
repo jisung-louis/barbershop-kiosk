@@ -258,3 +258,8 @@ input[type="text"] {
     text-decoration: none;
     cursor: pointer;
 }
+
+.count-down {
+    font-size: 50px;
+    font-weight: bold;
+}

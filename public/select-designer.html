@@ -52,7 +52,6 @@
             button.addEventListener('click', function () {
               selectedDesigner = designer;
               localStorage.setItem('selectedDesigner', JSON.stringify(designer)); // 디자이너 정보 저장
-              alert(`디자이너 ${designer.name} 선택됨`);
               // 선택된 디자이너 버튼 강조
               document.querySelectorAll('.designer-btn').forEach(btn => btn.classList.remove('selected'));
               button.classList.add('selected');
