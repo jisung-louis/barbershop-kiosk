@@ -1,0 +1,260 @@
+/* 기존 스타일 유지 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    position: relative;
+    width: 80%;
+    max-width: 1200px;
+}
+
+.title {
+    font-size: 36px;
+    color: #333;
+}
+
+.subtitle {
+    font-size: 24px;
+    color: #333;
+    margin: 20px 0 10px 0;
+}
+
+.login-section, .signup-section {
+    margin: 20px 0;
+}
+
+input[type="text"] {
+    width: 80%;
+    padding: 15px;
+    margin: 10px 0;
+    box-sizing: border-box;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover, .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 디자이너 선택 버튼 스타일 */
+.designer-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.designer-btn {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    width: 200px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.designer-btn img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.designer-btn h2, .designer-btn p {
+    margin: 10px 0 0 0;
+}
+
+.designer-btn.selected {
+    border: 2px solid #4CAF50;
+}
+
+.medium-btn {
+    width: calc(200px * 3); /* 3배 넓게 */
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.checkbox {
+    text-align: left;
+    font-size: 36px; /* 글꼴을 2배 크게 */
+}
+
+.checkbox input[type="checkbox"] {
+    transform: scale(3); /* 체크박스를 3배 크게 */
+}
+
+.btn#next-btn, .btn#pay-btn {
+    font-size: 18px;
+}
+
+/* 시술 선택 버튼 스타일 */
+.service-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.service-btn {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    width: 200px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.service-btn h2, .service-btn p {
+    margin: 10px 0 0 0;
+}
+
+.service-btn.selected {
+    border: 2px solid #4CAF50;
+}
+
+/* 구분선 스타일 */
+.separator {
+    width: 80%;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+}
+
+/* 부가 서비스 선택 버튼 스타일 */
+.additional-services {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.add-service-btn {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 20px;
+    text-align: center;
+    width: 200px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.add-service-btn.selected {
+    border: 2px solid #4CAF50;
+}
+
+/* 결제 화면 스타일 */
+.checkout-item {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+}
+
+#total-price {
+    font-size: 54px; /* 글꼴을 4배 크게 */
+}
+
+.services-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* 추가: 상담 여부 팝업 스타일 */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.close-consultation {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-consultation:hover, .close-consultation:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

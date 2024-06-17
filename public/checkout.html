@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 id="checkout-title"></h1>
+    
+    <div id="selected-designer" class="checkout-item services-container"></div>
+    
+    <div id="selected-services" class="checkout-item services-container"></div>
+    
+    <div id="selected-additional-services" class="checkout-item services-container"></div>
+    
+    <div id="total-price" class="checkout-item"></div>
+    
+    <div class="options">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="receipt"> 영수증 출력 여부
+        </label>
+      </div>
+      <button id="pay-btn" class="btn">결제</button>
+    </div>
+  </div>
+
+  <!-- Modal for changing designer -->
+  <div id="designer-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-designer">&times;</span>
+      <h2>디자이너 변경</h2>
+      <div id="designer-list-modal" class="designer-list"></div>
+      <button id="confirm-change-designer" class="btn">선택</button>
+    </div>
+  </div>
+
+  <!-- Modal for changing services -->
+  <div id="service-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-service">&times;</span>
+      <h2>시술 변경</h2>
+      <div id="service-list-modal" class="service-list"></div>
+      <button id="confirm-change-service" class="btn">선택</button>
+    </div>
+  </div>
+
+  <!-- Modal for changing additional services -->
+  <div id="additional-service-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-additional-service">&times;</span>
+      <h2>부가 서비스 변경</h2>
+      <div id="additional-service-list-modal" class="additional-service-list"></div>
+      <button id="confirm-change-additional-service" class="btn">선택</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // 로컬 스토리지에서 데이터 불러오기
+      const customerName = localStorage.getItem('customerName'); // 고객의 이름
+      const phone = localStorage.getItem('customerPhone'); // 고객의 전화번호
+      let selectedDesigner = JSON.parse(localStorage.getItem('selectedDesigner'));
+      let selectedServices = JSON.parse(localStorage.getItem('selectedServices'));
+      let selectedAdditionalServices = JSON.parse(localStorage.getItem('selectedAdditionalServices'));
+  
+      let newSelectedDesigner = selectedDesigner;
+      let newSelectedServices = [...selectedServices];
+      let newSelectedAdditionalServices = [...selectedAdditionalServices];
+  
+      // 총 시술 금액 계산
+      const calculateTotalPrice = () => {
+        return selectedServices.reduce((sum, service) => sum + parseInt(service.price), 0);
+      };
+  
+      // 페이지 로드 후 실행
+      document.getElementById('checkout-title').textContent = `${customerName}님이 선택한 서비스는...`;
+  
+      // 선택한 디자이너 표시
+      const designerElement = document.getElementById('selected-designer');
+      designerElement.innerHTML = `
+        <button class="designer-btn medium-btn">
+          <img src="images/${selectedDesigner.photo}" alt="${selectedDesigner.name}" />
+          <div>
+            <h2>${selectedDesigner.name}</h2>
+            <p>${selectedDesigner.position}</p>
+          </div>
+        </button>
+      `;
+      designerElement.querySelector('.designer-btn').addEventListener('click', function () {
+        document.getElementById('designer-modal').style.display = 'block';
+      });
+  
+      // 선택한 시술 표시
+      const servicesElement = document.getElementById('selected-services');
+      servicesElement.innerHTML = ''; // 초기화
+      selectedServices.forEach(service => {
+        const button = document.createElement('button');
+        button.classList.add('service-btn', 'large-btn');
+        button.innerHTML = `
+          <div>
+            <h2>${service.name}</h2>
+            <p>${parseInt(service.price)}원</p>
+          </div>
+        `;
+        button.addEventListener('click', function () {
+          document.getElementById('service-modal').style.display = 'block';
+        });
+        servicesElement.appendChild(button);
+      });
+  
+      // 선택한 부가 서비스 표시
+      const additionalServicesElement = document.getElementById('selected-additional-services');
+      additionalServicesElement.innerHTML = ''; // 초기화
+      if (selectedAdditionalServices.length > 0) {
+        selectedAdditionalServices.forEach(service => {
+          const button = document.createElement('button');
+          button.classList.add('service-btn', 'large-btn');
+          button.textContent = service;
+          button.addEventListener('click', function () {
+            document.getElementById('additional-service-modal').style.display = 'block';
+          });
+          additionalServicesElement.appendChild(button);
+        });
+      } else {
+        const button = document.createElement('button');
+        button.classList.add('add-service-btn');
+        button.textContent = '부가서비스 선택하기';
+        button.addEventListener('click', function () {
+          document.getElementById('additional-service-modal').style.display = 'block';
+        });
+        additionalServicesElement.appendChild(button);
+      }
+  // 총 시술 금액 표시
+document.getElementById('total-price').textContent = `총 시술 금액: ${calculateTotalPrice()}원`;
+// 결제 버튼 클릭 이벤트
+document.getElementById('pay-btn').addEventListener('click', function () {
+  const receipt = document.getElementById('receipt').checked;
+
+  const customerData = {
+    phone: customerName, // 고객의 전화번호만 전송
+    designer: selectedDesigner,
+    consultation: false, // 상담 여부는 고정값으로 설정
+    services: selectedServices,
+    additionalServices: selectedAdditionalServices,
+    totalPrice: calculateTotalPrice(),
+    receipt: receipt
+  };
+
+  console.log('전송할 데이터:', customerData);
+
+  // 고객 데이터 저장 요청
+  fetch('/save-customer-data', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(customerData)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('서버 응답 데이터:', data);
+    if (data.success) {
+      console.log('고객 데이터:', data.customerData);
+      // 마무리 화면으로 이동
+      window.location.href = '/finish.html';
+    } else {
+      alert('데이터 저장에 실패했습니다.');
+    }
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+    alert('데이터 저장에 실패했습니다.');
+  });
+});
+
+// 모달 닫기 이벤트
+document.querySelector('.close-designer').addEventListener('click', function () {
+  document.getElementById('designer-modal').style.display = 'none';
+  newSelectedDesigner = selectedDesigner; // 변경 사항 무시
+});
+document.querySelector('.close-service').addEventListener('click', function () {
+  if (newSelectedServices.length === 0) {
+    alert('최소 하나의 시술을 선택해야 합니다.');
+  } else {
+    document.getElementById('service-modal').style.display = 'none';
+    newSelectedServices = [...selectedServices]; // 변경 사항 무시
+  }
+});
+document.querySelector('.close-additional-service').addEventListener('click', function () {
+  document.getElementById('additional-service-modal').style.display = 'none';
+  newSelectedAdditionalServices = [...selectedAdditionalServices]; // 변경 사항 무시
+});
+
+// 모달 외부 클릭 시 닫기
+window.addEventListener('click', function (event) {
+  if (event.target === document.getElementById('designer-modal')) {
+    document.getElementById('designer-modal').style.display = 'none';
+    newSelectedDesigner = selectedDesigner; // 변경 사항 무시
+  }
+  if (event.target === document.getElementById('service-modal')) {
+    if (newSelectedServices.length === 0) {
+      alert('최소 하나의 시술을 선택해야 합니다.');
+    } else {
+      document.getElementById('service-modal').style.display = 'none';
+      newSelectedServices = [...selectedServices]; // 변경 사항 무시
+    }
+  }
+  if (event.target === document.getElementById('additional-service-modal')) {
+    document.getElementById('additional-service-modal').style.display = 'none';
+    newSelectedAdditionalServices = [...selectedAdditionalServices]; // 변경 사항 무시
+  }
+});
+
+// 디자이너 변경 모달에 디자이너 목록 표시
+fetch('/designers')
+  .then(response => response.json())
+  .then(designers => {
+    const list = document.getElementById('designer-list-modal');
+    list.innerHTML = '';
+    designers.forEach(designer => {
+      const button = document.createElement('button');
+      button.classList.add('designer-btn');
+      if (designer.name === selectedDesigner.name) {
+        button.classList.add('selected'); // 선택된 디자이너 강조
+      }
+      button.innerHTML = `
+        <img src="images/${designer.photo}" alt="${designer.name}" />
+        <div>
+          <h2>${designer.name}</h2>
+          <p>${designer.position}</p>
+        </div>
+      `;
+      button.addEventListener('click', function () {
+        document.querySelectorAll('#designer-list-modal .designer-btn').forEach(btn => btn.classList.remove('selected'));
+        button.classList.add('selected');
+        newSelectedDesigner = designer;
+      });
+      list.appendChild(button);
+    });
+  });
+
+document.getElementById('confirm-change-designer').addEventListener('click', function () {
+  selectedDesigner = newSelectedDesigner;
+  localStorage.setItem('selectedDesigner', JSON.stringify(selectedDesigner)); // 변경된 디자이너 정보 저장
+  document.getElementById('designer-modal').style.display = 'none';
+  updateCheckout();
+});
+
+// 시술 변경 모달에 시술 목록 표시
+fetch('/services')
+  .then(response => response.json())
+  .then(services => {
+    const list = document.getElementById('service-list-modal');
+    list.innerHTML = '';
+    services.forEach(service => {
+      const button = document.createElement('button');
+      button.classList.add('service-btn');
+      if (selectedServices.some(s => s.name === service.name)) {
+        button.classList.add('selected'); // 선택된 시술 강조
+      }
+      button.innerHTML = `
+        <div>
+          <h2>${service.name}</h2>
+          <p>${parseInt(service.price)}원</p>
+        </div>
+      `;
+      button.addEventListener('click', function () {
+        if (newSelectedServices.some(s => s.name === service.name)) {
+          newSelectedServices = newSelectedServices.filter(s => s.name !== service.name);
+          button.classList.remove('selected');
+        } else {
+          newSelectedServices.push(service);
+          button.classList.add('selected');
+        }
+      });
+      list.appendChild(button);
+    });
+  });
+
+document.getElementById('confirm-change-service').addEventListener('click', function () {
+  if (newSelectedServices.length === 0) {
+    alert('최소 하나의 시술을 선택해야 합니다.');
+  } else {
+    selectedServices = newSelectedServices;
+    localStorage.setItem('selectedServices', JSON.stringify(selectedServices)); // 변경된 시술 정보 저장
+    document.getElementById('service-modal').style.display = 'none';
+    updateCheckout();
+  }
+});
+
+// 부가 서비스 변경 모달에 부가 서비스 목록 표시
+fetch('/services/additional-services')
+  .then(response => response.json())
+  .then(services => {
+    const list = document.getElementById('additional-service-list-modal');
+    list.innerHTML = '';
+    services.forEach(service => {
+      const button = document.createElement('button');
+      button.classList.add('add-service-btn');
+      if (selectedAdditionalServices.includes(service)) {
+        button.classList.add('selected'); // 선택된 부가 서비스 강조
+      }
+      button.textContent = service;
+      button.addEventListener('click', function () {
+        if (newSelectedAdditionalServices.includes(service)) {
+          newSelectedAdditionalServices = newSelectedAdditionalServices.filter(s => s !== service);
+          button.classList.remove('selected');
+        } else {
+          newSelectedAdditionalServices.push(service);
+          button.classList.add('selected');
+        }
+      });
+      list.appendChild(button);
+    });
+  });
+
+document.getElementById('confirm-change-additional-service').addEventListener('click', function () {
+  selectedAdditionalServices = newSelectedAdditionalServices;
+  localStorage.setItem('selectedAdditionalServices', JSON.stringify(selectedAdditionalServices)); // 변경된 부가 서비스 정보 저장
+  document.getElementById('additional-service-modal').style.display = 'none';
+  updateCheckout();
+});
+
+// 체크아웃 업데이트 함수
+function updateCheckout() {
+  // 디자이너 업데이트
+  const designerElement = document.getElementById('selected-designer');
+  designerElement.innerHTML = `
+    <button class="designer-btn medium-btn">
+      <img src="images/${selectedDesigner.photo}" alt="${selectedDesigner.name}" />
+      <div>
+        <h2>${selectedDesigner.name}</h2>
+        <p>${selectedDesigner.position}</p>
+      </div>
+    </button>
+  `;
+  designerElement.querySelector('.designer-btn').addEventListener('click', function () {
+    document.getElementById('designer-modal').style.display = 'block';
+  });
+
+  // 시술 및 부가 서비스 업데이트
+  const servicesElement = document.getElementById('selected-services');
+  servicesElement.innerHTML = '';
+  selectedServices.forEach(service => {
+    const button = document.createElement('button');
+    button.classList.add('service-btn', 'large-btn');
+    button.innerHTML = `
+      <div>
+        <h2>${service.name}</h2>
+        <p>${parseInt(service.price)}원</p>
+      </div>
+    `;
+    button.addEventListener('click', function () {
+      document.getElementById('service-modal').style.display = 'block';
+    });
+    servicesElement.appendChild(button);
+  });
+
+  // 부가 서비스 업데이트
+  const additionalServicesElement = document.getElementById('selected-additional-services');
+  additionalServicesElement.innerHTML = '';
+  if (selectedAdditionalServices.length > 0) {
+    selectedAdditionalServices.forEach(service => {
+      const button = document.createElement('button');
+      button.classList.add('service-btn', 'large-btn');
+      button.textContent = service;
+      button.addEventListener('click', function () {
+        document.getElementById('additional-service-modal').style.display = 'block';
+        });
+        additionalServicesElement.appendChild(button);
+        });
+        } else {
+        const button = document.createElement('button');
+        button.classList.add('add-service-btn');
+        button.textContent = '부가서비스 선택하기';
+        button.addEventListener('click', function () {
+        document.getElementById('additional-service-modal').style.display = 'block';
+        });
+        additionalServicesElement.appendChild(button);
+        }
+          // 총 시술 금액 업데이트
+  document.getElementById('total-price').textContent = `총 시술 금액: ${calculateTotalPrice()}원`;
+}
+});
+</script>
+     
+</body>
+</html>

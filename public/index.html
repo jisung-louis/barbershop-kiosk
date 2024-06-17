@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sungkyul Hair Shop</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Sungkyul Hair Shop</h1>
+    <div class="login-section">
+      <input type="text" id="phone" placeholder="전화번호 뒷자리 4자리">
+      <button id="login-btn" class="btn">로그인</button>
+    </div>
+    <div class="signup-section">
+      <button id="signup-btn" class="btn">회원가입</button>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 -->
+  <div id="signup-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-signup">&times;</span>
+      <h2>회원가입</h2>
+      <input type="text" id="signup-name" placeholder="이름">
+      <input type="text" id="signup-phone" placeholder="전화번호 뒷자리 4자리">
+      <button id="signup-submit" class="btn">가입</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('login-btn').addEventListener('click', function () {
+      const phone = document.getElementById('phone').value;
+      fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ phone: phone })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '/select-designer.html';
+        } else {
+          alert('로그인 실패: ' + data.message);
+        }
+      });
+    });
+
+    document.getElementById('signup-btn').addEventListener('click', function () {
+      document.getElementById('signup-modal').style.display = 'block';
+    });
+
+    document.querySelector('.close-signup').addEventListener('click', function () {
+      document.getElementById('signup-modal').style.display = 'none';
+    });
+
+    document.getElementById('signup-submit').addEventListener('click', function () {
+      const name = document.getElementById('signup-name').value;
+      const phone = document.getElementById('signup-phone').value;
+      fetch('/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name, phone: phone })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('회원가입 성공');
+          document.getElementById('signup-modal').style.display = 'none';
+        } else {
+          alert('회원가입 실패: ' + data.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

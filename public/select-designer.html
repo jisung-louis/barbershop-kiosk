@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Select Designer</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">디자이너를 선택하세요</h1>
+    <div class="designer-list" id="designer-list"></div>
+    
+    <div class="options">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="consultation"> 상담 여부
+        </label>
+      </div>
+      <button id="next-btn" class="btn">다음</button>
+    </div>
+  </div>
+
+  <!-- 상담 여부 팝업 -->
+  <div id="consultation-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-consultation">&times;</span>
+      <h2>시술 서비스를 상담 후에 결정 하시겠습니까?</h2>
+      <p>선택 시 결제는 대면 결제만 가능합니다.</p>
+      <button id="consultation-yes" class="btn">Yes</button>
+      <button id="consultation-no" class="btn">No</button>
+    </div>
+  </div>
+
+  <script>
+    let selectedDesigner = null;
+    let consultation = false;
+
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('/designers')
+        .then(response => response.json())
+        .then(designers => {
+          const list = document.getElementById('designer-list');
+          designers.forEach(designer => {
+            const button = document.createElement('button');
+            button.classList.add('designer-btn');
+            button.innerHTML = `
+              <img src="images/${designer.photo}" alt="${designer.name}" />
+              <div>
+                <h2>${designer.name}</h2>
+                <p>${designer.position}</p>
+              </div>
+            `;
+            button.addEventListener('click', function () {
+              selectedDesigner = designer;
+              localStorage.setItem('selectedDesigner', JSON.stringify(designer)); // 디자이너 정보 저장
+              alert(`디자이너 ${designer.name} 선택됨`);
+              // 선택된 디자이너 버튼 강조
+              document.querySelectorAll('.designer-btn').forEach(btn => btn.classList.remove('selected'));
+              button.classList.add('selected');
+            });
+            list.appendChild(button);
+          });
+        });
+
+      document.getElementById('consultation').addEventListener('change', function () {
+        consultation = this.checked;
+        if (consultation) {
+          document.getElementById('consultation-modal').style.display = 'block';
+        }
+      });
+
+      document.querySelector('.close-consultation').addEventListener('click', function () {
+        document.getElementById('consultation-modal').style.display = 'none';
+        document.getElementById('consultation').checked = false;
+        consultation = false;
+      });
+
+      document.getElementById('consultation-yes').addEventListener('click', function () {
+        const customerData = {
+          designer: selectedDesigner,
+          consultation: true,
+          services: null,
+          additionalServices: null,
+          totalPrice: null,
+          receipt: null
+        };
+
+        fetch('/save-customer-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(customerData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log('고객 데이터:', data.customerData);
+            window.location.href = '/finish.html';
+          }
+        });
+      });
+
+      document.getElementById('consultation-no').addEventListener('click', function () {
+        document.getElementById('consultation-modal').style.display = 'none';
+        document.getElementById('consultation').checked = false;
+        consultation = false;
+      });
+
+      document.getElementById('next-btn').addEventListener('click', function () {
+        if (!selectedDesigner) {
+          alert('디자이너를 선택하세요.');
+          return;
+        }
+        if (!consultation) {
+          localStorage.setItem('consultation', consultation); // 상담 여부 저장
+          window.location.href = '/select-service.html'; // 시술 선택 화면으로 이동
+        }
+      });
+    });
+  </script>
+</body>
+</html>

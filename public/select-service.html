@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Select Service</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">원하는 시술을 선택하세요</h1>
+    <div class="service-list" id="service-list"></div>
+    
+    <hr class="separator">
+
+    <h2 class="subtitle">부가 서비스를 선택하세요</h2>
+    <div class="additional-services" id="additional-services">
+      <button class="add-service-btn" data-service="스몰토크">스몰토크</button>
+      <button class="add-service-btn" data-service="간식">간식</button>
+    </div>
+
+    <button id="next-btn" class="btn">다음</button>
+  </div>
+
+  <script>
+    let selectedServices = [];
+    let selectedAdditionalServices = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('/services')
+        .then(response => response.json())
+        .then(services => {
+          const list = document.getElementById('service-list');
+          services.forEach(service => {
+            const button = document.createElement('button');
+            button.classList.add('service-btn');
+            button.innerHTML = `
+              <div>
+                <h2>${service.name}</h2>
+                <p>${parseInt(service.price)}원</p>
+              </div>
+            `;
+            button.addEventListener('click', function () {
+              if (selectedServices.includes(service)) {
+                selectedServices = selectedServices.filter(s => s !== service);
+                button.classList.remove('selected');
+              } else {
+                selectedServices.push(service);
+                button.classList.add('selected');
+              }
+              console.log('Selected services:', selectedServices); // Debugging log
+            });
+            list.appendChild(button);
+          });
+        });
+
+      document.querySelectorAll('.add-service-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const service = this.getAttribute('data-service');
+          if (selectedAdditionalServices.includes(service)) {
+            selectedAdditionalServices = selectedAdditionalServices.filter(s => s !== service);
+            button.classList.remove('selected');
+          } else {
+            selectedAdditionalServices.push(service);
+            button.classList.add('selected');
+          }
+          console.log('Selected additional services:', selectedAdditionalServices); // Debugging log
+        });
+      });
+
+      document.getElementById('next-btn').addEventListener('click', function () {
+        if (selectedServices.length === 0) {
+          alert('시술을 선택하세요.');
+          return;
+        }
+        // 선택된 시술과 부가 서비스 저장
+        localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
+        localStorage.setItem('selectedAdditionalServices', JSON.stringify(selectedAdditionalServices));
+        // 시술 선택 후 다음 화면으로 이동
+        window.location.href = '/checkout.html';
+      });
+    });
+  </script>
+</body>
+</html>
