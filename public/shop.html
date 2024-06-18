@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Appointments</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .delete-btn {
+            color: red;
+            cursor: pointer;
+        }
+        .tables-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .table-wrapper {
+            flex: 1;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>시술 대기중인 고객</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>순서</th>
+                <th>고객명</th>
+                <th>선택한 디자이너</th>
+                <th>선택한 서비스</th>
+                <th>선택한 부가 서비스</th>
+                <th>결제한 가격</th>
+                <th>영수증 출력 여부</th>
+                <th>삭제</th>
+            </tr>
+        </thead>
+        <tbody id="appointment-list">
+            <!-- Appointment data will be inserted here -->
+        </tbody>
+    </table>
+    <hr class="separator">
+    <h1>상담 요청 고객</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>순서</th>
+                <th>고객명</th>
+                <th>선택한 디자이너</th>
+                <th>삭제</th>
+            </tr>
+        </thead>
+        <tbody id="consultation-list">
+            <!-- Consultation data will be inserted here -->
+        </tbody>
+    </table>
+
+    <hr class="separator">
+
+    <div class="tables-container">
+        <div class="table-wrapper">
+            <h1>회원 목록</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>고객명</th>
+                        <th>휴대폰 뒷자리</th>
+                    </tr>
+                </thead>
+                <tbody id="customer-list">
+                    <!-- Customer data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-wrapper">
+            <h1>디자이너 목록</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>디자이너 명</th>
+                        <th>직책</th>
+                        <th>프로필 사진</th>
+                    </tr>
+                </thead>
+                <tbody id="designer-list">
+                    <!-- Designer data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-wrapper">
+            <h1>시술 목록</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>시술 종류</th>
+                        <th>가격</th>
+                    </tr>
+                </thead>
+                <tbody id="service-list">
+                    <!-- Service data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/appointments')
+                .then(response => response.json())
+                .then(data => {
+                    const appointmentList = document.getElementById('appointment-list');
+                    const consultationList = document.getElementById('consultation-list');
+                    data.forEach(appointment => {
+                        if (appointment.consultation == 0) {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${appointment.id}</td>
+                                <td>${appointment.customer_name}</td>
+                                <td>${appointment.designer_name}</td>
+                                <td>${appointment.service_names}</td>
+                                <td>${appointment.additional_services}</td>
+                                <td>${appointment.total_price}</td>
+                                <td>${appointment.receipt}</td>
+                                <td><span class="delete-btn" data-id="${appointment.id}">Delete</span></td>
+                            `;
+                            appointmentList.appendChild(row);
+                        } else if (appointment.consultation == 1) {
+                            const consultRow = document.createElement('tr');
+                            consultRow.innerHTML = `
+                                <td>${appointment.id}</td>
+                                <td>${appointment.customer_name}</td>
+                                <td>${appointment.designer_name}</td>
+                                <td><span class="delete-btn" data-id="${appointment.id}">Delete</span></td>
+                            `;
+                            consultationList.appendChild(consultRow);
+                        }
+                    });
+
+                    document.querySelectorAll('.delete-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const id = this.getAttribute('data-id');
+                            fetch(`/delete-appointment/${id}`, { method: 'DELETE' })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        window.location.reload();
+                                    } else {
+                                        alert('Error deleting appointment');
+                                    }
+                                });
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching appointments:', error));
+
+            fetch('/customers')
+                .then(response => response.json())
+                .then(data => {
+                    const customerList = document.getElementById('customer-list');
+                    data.forEach(customer => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${customer.id}</td>
+                            <td>${customer.name}</td>
+                            <td>${customer.phone}</td>
+                        `;
+                        customerList.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching customers:', error));
+
+            fetch('/designers')
+                .then(response => response.json())
+                .then(data => {
+                    const designerList = document.getElementById('designer-list');
+                    data.forEach(designer => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${designer.id}</td>
+                            <td>${designer.name}</td>
+                            <td>${designer.position}</td>
+                            <td><img src="images/${designer.photo}" alt="${designer.name}" width="50"></td>
+                        `;
+                        designerList.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching designers:', error));
+
+            fetch('/services')
+                .then(response => response.json())
+                .then(data => {
+                    const serviceList = document.getElementById('service-list');
+                    data.forEach(service => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${service.id}</td>
+                            <td>${service.name}</td>
+                            <td>${service.price}</td>
+                        `;
+                        serviceList.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching services:', error));
+        });
+    </script>
+</body>
+</html>

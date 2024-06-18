@@ -128,7 +128,8 @@ connection.connect((err) => {
                       ('펌', 50000),
                       ('염색', 80000),
                       ('샴푸', 10000),
-                      ('클리닉', 50000)
+                      ('클리닉', 50000),
+                      ('상담 후 결정', 0)
                       ON DUPLICATE KEY UPDATE name=VALUES(name), price=VALUES(price);`, (err, result) => {
                       if (err) {
                         console.error('Error inserting default services:', err.stack);

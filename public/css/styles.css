@@ -27,7 +27,7 @@ body {
     margin: 20px 0 10px 0;
 }
 
-.login-section, .signup-section {
+.login-section, .signup-section, .admin-section{
     margin: 20px 0;
 }
 

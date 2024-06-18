@@ -14,6 +14,24 @@
     <div class="signup-section">
       <button id="signup-btn" class="btn">회원가입</button>
     </div>
+    <br><br><br><br><br><br>
+    <hr class="separator">
+    <div class="admin-section">
+      <button id="dev-btn" class="btn">개발자 정보</button>
+      <button id="shop-btn" class="btn">예약자 정보</button>
+    </div>
+  </div>
+  <div id="dev-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-dev">&times;</span>
+      <h2>이 키오스크 프로그램은...</h2>
+      <br>
+      <h3>성결대학교 소프트웨어공학 팀13</h3>
+      <p>강해원, 김성범, 전지성, 정서영, 조동현이 제작했고<br>저작권은 팀13에 있습니다.</p>
+      <p>© 2024 Team13. all rights reserved.</p>
+      <br>
+      <a href="https://github.com/jisung-louis/barbershop-kiosk">GitHub에서 소스코드 확인하기</a>
+    </div>
   </div>
 
   <!-- 회원가입 모달 -->
@@ -78,6 +96,19 @@
         }
       });
     });
+    document.getElementById('dev-btn').addEventListener('click',function(){
+      document.getElementById('dev-modal').style.display = 'block';
+    });
+
+    document.querySelector('.close-dev').addEventListener('click', function () {
+      document.getElementById('dev-modal').style.display = 'none';
+    });
+
+    document.getElementById('shop-btn').addEventListener('click',function(){
+      window.location.href = 'shop.html';
+    });
+
+    
   </script>
 </body>
 </html>
