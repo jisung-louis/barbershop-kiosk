@@ -35,25 +35,28 @@
 config/db에서 mysql password를 본인의 password로 변경합니다.
 
 
-  ```javascript
-  const mysql = require('mysql2');
+     ```javascript
+     const mysql = require('mysql2');
 
-const connection = mysql.createConnection({
-  host: 'localhost', // 로컬 MySQL 서버의 호스트
-  user: 'root',      // MySQL 사용자 이름
-  password: 'your_password', // MySQL 비밀번호
-  database: 'barbershop'  // 데이터베이스 이름
-});
-```
+     const connection = mysql.createConnection({
+     host: 'localhost', // 로컬 MySQL 서버의 호스트
+     user: 'root',      // MySQL 사용자 이름
+     password: 'your_password', // MySQL 비밀번호
+     database: 'barbershop'  // 데이터베이스 이름
+     });
+     ```
+     
 4. **DB 초기화**
 
-```sh
-npm run setup-db
-```
+   ```sh
+   npm run setup-db
+   ```
+
 5. **실행**
-```sh
-npm start
-```
+   ```sh
+   npm start
+   ```
+
 6, **로컬호스트 접속**
 http://localhost:3000
 
@@ -61,7 +64,7 @@ http://localhost:3000
 
 성결대학교 소프트웨어공학 팀13
 
-팀장 - 정서영
+팀장 - 정서영 /
 팀원 - 전지성
       김성범
       조동현
