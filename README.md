@@ -57,18 +57,17 @@ config/db에서 mysql password를 본인의 password로 변경합니다.
    npm start
    ```
 
-6. **로컬호스트 접속**    
+6. **로컬호스트 접속**  
+
 http://localhost:3000
 
 ## 만든이
 
-성결대학교 소프트웨어공학 팀13
+성결대학교 소프트웨어공학 팀13  
 
 팀장 - 정서영  
-팀원 - 전지성  
-      김성범  
-      조동현  
-      강해원  
+팀원 - 전지성, 김성범, 조동현, 강해원  
+
 
 © 2024 Team13. all rights reserved.
 
