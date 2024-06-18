@@ -34,6 +34,10 @@
     let selectedDesigner = null;
     let consultation = false;
 
+    const customerName = localStorage.getItem('customerName'); // 고객의 이름
+    const customerId = localStorage.getItem('customerId');
+    const phone = localStorage.getItem('customerPhone'); // 고객의 전화번호
+
     document.addEventListener('DOMContentLoaded', function () {
       fetch('/designers')
         .then(response => response.json())
@@ -63,7 +67,15 @@
       document.getElementById('consultation').addEventListener('change', function () {
         consultation = this.checked;
         if (consultation) {
+          if(selectedDesigner){
           document.getElementById('consultation-modal').style.display = 'block';
+          }
+          else{ //디자이너를 선택하지 않고 상담 체크박스를 눌렀을 경우
+            alert('상담 받으실 디자이너를 먼저 선택해주세요.');
+            document.getElementById('consultation-modal').style.display = 'none';
+            document.getElementById('consultation').checked = false;
+            consultation = false;
+          }
         }
       });
 
@@ -75,6 +87,9 @@
 
       document.getElementById('consultation-yes').addEventListener('click', function () {
         const customerData = {
+          customerId:customerId,
+          customerName:customerName,
+          customerPhone:phone,
           designer: selectedDesigner,
           consultation: true,
           services: null,

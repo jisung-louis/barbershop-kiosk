@@ -68,8 +68,10 @@ app.post('/save-customer-data', (req, res) => {
   
     /*console.log('요청 데이터:', req.body);*/ //저장 요청이 제대로 전송됐는지 확인하는 콘솔 로그
   
-    const servicesIds = services.map(service => service.id).join(',');
-    const additionalServicesStr = additionalServices.join(',');
+    
+    /*const servicesIds = services.map(service => service.id).join(',');*/
+    const servicesIds = (Array.isArray(services) ? services : []).map(service => service.id).join(',');
+    const additionalServicesStr = (Array.isArray(additionalServices) ? additionalServices : []).join(',');
   
     const insertQuery = `
         INSERT INTO appointments (customer_id, designer_id, service_ids, additional_services, total_price, receipt, consultation)
