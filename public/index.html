@@ -40,6 +40,9 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
+          localStorage.setItem('customerName', data.customerName);
+          localStorage.setItem('customerId', data.customerId);
+          localStorage.setItem('customerPhone', phone);
           window.location.href = '/select-designer.html';
         } else {
           alert('로그인 실패: ' + data.message);

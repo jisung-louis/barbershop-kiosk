@@ -90,13 +90,14 @@ connection.connect((err) => {
                 connection.query(`
                   CREATE TABLE IF NOT EXISTS appointments (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    customer_name VARCHAR(255) NOT NULL,
+                    customer_id INT NOT NULL,
                     designer_id INT NOT NULL,
                     service_ids VARCHAR(255),
                     additional_services VARCHAR(255),
                     total_price DECIMAL(10, 2),
                     receipt BOOLEAN,
                     consultation BOOLEAN,
+                    FOREIGN KEY (customer_id) REFERENCES customers(id),
                     FOREIGN KEY (designer_id) REFERENCES designers(id)
                   );`, (err, result) => {
                   if (err) {

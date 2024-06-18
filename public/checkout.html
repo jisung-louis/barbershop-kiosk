@@ -60,6 +60,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       // 로컬 스토리지에서 데이터 불러오기
       const customerName = localStorage.getItem('customerName'); // 고객의 이름
+      const customerId = localStorage.getItem('customerId');
       const phone = localStorage.getItem('customerPhone'); // 고객의 전화번호
       let selectedDesigner = JSON.parse(localStorage.getItem('selectedDesigner'));
       let selectedServices = JSON.parse(localStorage.getItem('selectedServices'));
@@ -138,8 +139,10 @@ document.getElementById('total-price').textContent = `총 시술 금액: ${calcu
 document.getElementById('pay-btn').addEventListener('click', function () {
   const receipt = document.getElementById('receipt').checked;
 
-  const customerData = {
-    phone: customerName, // 고객의 전화번호만 전송
+  const customerChosenData = {
+    customerId: customerId, // 고객의 id 전송
+    customerName: customerName,
+    customerPhone: phone,
     designer: selectedDesigner,
     consultation: false, // 상담 여부는 고정값으로 설정
     services: selectedServices,
@@ -148,7 +151,7 @@ document.getElementById('pay-btn').addEventListener('click', function () {
     receipt: receipt
   };
 
-  console.log('전송할 데이터:', customerData);
+  console.log('전송할 데이터:', customerChosenData);
 
   // 고객 데이터 저장 요청
   fetch('/save-customer-data', {
@@ -156,7 +159,7 @@ document.getElementById('pay-btn').addEventListener('click', function () {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(customerData)
+    body: JSON.stringify(customerChosenData)
   })
   .then(response => {
     if (!response.ok) {

@@ -1,5 +1,4 @@
 const express = require('express');
-const session = require('express-session');
 const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
@@ -8,13 +7,6 @@ const db = require('./config/db'); // 경로 수정
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(session({
-  secret: 'your-secret-key',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // 개발 환경에서는 false, 프로덕션에서는 true로 설정
-}));
 
 // Static files
 app.use(express.static('public'));
@@ -29,10 +21,8 @@ app.post('/login', (req, res) => {
         console.error('DB 조회 오류:', error);
         res.status(500).send('Internal Server Error');
       } else if (results.length > 0) {
-        req.session.customerId = results[0].id;
-        req.session.customerName = results[0].name;
-        req.session.customerPhone = results[0].phone; // 전화번호 저장
-        res.json({ success: true });
+        const customer = results[0];
+        res.json({ success: true, customerName: customer.name, customerId: customer.id, customerPhone: customer.phone });
       } else {
         res.json({ success: false, message: '전화번호가 일치하지 않습니다.' });
       }
@@ -74,39 +64,19 @@ app.get('/get-customer-id', (req, res) => {
 
 // 고객 데이터 저장 라우트
 app.post('/save-customer-data', (req, res) => {
-    const { phone, designer, consultation, services, additionalServices, totalPrice, receipt } = req.body;
+    const { customerId, customerName, customerPhone, designer, consultation, services, additionalServices, totalPrice, receipt } = req.body;
   
-    console.log('요청 데이터:', req.body);
+    /*console.log('요청 데이터:', req.body);*/ //저장 요청이 제대로 전송됐는지 확인하는 콘솔 로그
   
     const servicesIds = services.map(service => service.id).join(',');
     const additionalServicesStr = additionalServices.join(',');
   
-    // 고객이 있는지 확인합니다.
-    const getCustomerQuery = 'SELECT * FROM customers WHERE phone = ?';
-  
-    db.query(getCustomerQuery, [phone], (error, results) => {
-      if (error) {
-        console.error('DB 조회 오류:', error);
-        return res.status(500).send('Internal Server Error');
-      }
-  
-      console.log('DB 조회 결과:', results);
-  
-      /*if (results.length === 0) {
-        return res.status(404).json({ success: false, message: '고객을 찾을 수 없습니다.' });
-      }*/
-  
-      /*const customerPhone = results[0].phone;
-  
-      console.log('고객 전화번호:', customerPhone);*/
-  
-      // 고객 데이터 저장
-      const insertQuery = `
-        INSERT INTO appointments (customer_name, designer_id, service_ids, additional_services, total_price, receipt, consultation)
+    const insertQuery = `
+        INSERT INTO appointments (customer_id, designer_id, service_ids, additional_services, total_price, receipt, consultation)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
   
-      db.query(insertQuery, [phone, designer.id, servicesIds, additionalServicesStr, totalPrice, receipt, consultation], (error, results) => {
+      db.query(insertQuery, [customerId, designer.id, servicesIds, additionalServicesStr, totalPrice, receipt, consultation], (error, results) => {
         if (error) {
           console.error('DB 삽입 오류:', error);
           return res.status(500).json({ success: false, message: 'Internal Server Error' });
@@ -118,12 +88,12 @@ app.post('/save-customer-data', (req, res) => {
             console.error('DB 조회 오류:', error);
             return res.status(500).json({ success: false, message: 'Internal Server Error' });
           }
-  
+          console.log(`========= ${customerName}(${customerPhone})(ID:${customerId})님이 Kiosk에서 결제를 마쳤습니다! =========\n========= 다음은 appoinment 테이블에 방금 저장된 정보입니다. =========`);
           console.log('저장된 고객 데이터:', results[0]);
+          console.log('======================================================')
           res.json({ success: true, customerData: results[0] });
         });
       });
-    });
   });
         
         // 라우트 파일들
@@ -135,6 +105,6 @@ app.post('/save-customer-data', (req, res) => {
         app.use('/services', servicesRouter);
         app.use('/designers', designersRouter);
         
-        app.listen(port, () => {
+        app.listen(port, '0.0.0.0', () => {
         console.log(`Server running at http://localhost:${port}/`);
         });
