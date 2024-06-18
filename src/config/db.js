@@ -1,10 +1,10 @@
 const mysql = require('mysql2');
 
 const db = mysql.createConnection({
-  host: 'mydbinstance.c1gca26esclg.ap-northeast-2.rds.amazonaws.com', // 여기에 실제 RDS 엔드포인트를 입력하세요
-  user: 'admin',     // 여기에 실제 사용자 이름을 입력하세요
-  password: '12341234', // 여기에 실제 비밀번호를 입력하세요
-  database: 'barbershop'  // 여기에 실제 데이터베이스 이름을 입력하세요
+  host: 'localhost', // 로컬 MySQL 서버의 호스트
+  user: 'root',      // MySQL 설치 시 설정한 사용자 이름 (기본값은 'root')
+  password: '1234', // MySQL 설치 시 설정한 비밀번호
+  database: 'barbershop'  // 사용하고자 하는 데이터베이스 이름
 });
 
 db.connect((err) => {

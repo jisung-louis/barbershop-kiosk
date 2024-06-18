@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js",
-    "setup-db": "node setupDatabase.js"
+    "setup-db": "node setupDatabase.js",
+    "install-setup-db": "npm install && npm run setup-db"
   },
   "keywords": [],
   "author": "",
