@@ -21,7 +21,7 @@
 1. **레포지토리 클론:**
 
    ```sh
-   git clone https://github.com/your-username/barbershop-kiosk.git
+   git clone https://github.com/jisung-louis/barbershop-kiosk.git
    cd barbershop-kiosk
    ```
 
